@@ -1,6 +1,43 @@
 # ScanLogic: AI-Powered Receipt & Document Assistant
 
+[![Open Source](https://img.shields.io/badge/Open%20Source-MIT-green.svg)](LICENSE)
+[![Deploy to Render](https://img.shields.io/badge/Deploy%20to-Render-46E3B7.svg)](https://render.com)
+[![Telegram Bot](https://img.shields.io/badge/Telegram-Bot-blue.svg)](https://t.me/YOUR_BOT_USERNAME)
+
 ScanLogic is a production-ready, full-stack AI assistant designed to simplify expense tracking and document management. It leverages Google Gemini for intelligent OCR and data extraction, Supabase for secure data persistence, and Telegram as a lightweight, accessible interface.
+
+**🚀 Open Source & Self-Hostable** - Deploy your own instance in minutes!
+
+---
+
+## ✨ Features
+
+- 📸 **Smart Receipt Scanning** - AI-powered OCR extracts merchant, amount, date, and category
+- 💬 **Natural Language Queries** - Ask "How much did I spend this week?" and get instant answers
+- 📊 **Expense Analytics** - Track spending by category, merchant, or time period
+- 🔍 **Smart Search** - Find any receipt instantly
+- 📄 **PDF Form Filling** - Auto-fill forms using your saved profile
+- 📥 **Export Reports** - Download Excel/PDF reports for accounting
+
+---
+
+## 🚀 Quick Deploy
+
+### Deploy to Render (Recommended)
+
+1. Click the button below or follow [RENDER-DEPLOY.md](RENDER-DEPLOY.md)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+
+2. Add your environment variables (see [.env.example](.env.example))
+3. Your bot is live! 🎉
+
+### Other Platforms
+
+- **Railway**: See [deployment docs](RENDER-DEPLOY.md)
+- **Google Cloud Run**: Compatible
+- **Heroku**: Compatible
+- **Self-hosted**: Works on any Node.js server
 
 ---
 
