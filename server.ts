@@ -301,7 +301,8 @@ async function handleVoice(chatId: string, voice: any, messageId: number) {
 async function handleText(chatId: string, text: string, messageId: number) {
   console.log(`Handling text message from ${chatId}: ${text}`);
 
-  if (text.trim().startsWith("/start")) {
+  // Handle button presses
+  if (text === "📸 የእኔ ደረሰኞች" || text === "/myreceipts" || text.toLowerCase().includes("my receipts")) {
     const welcomeMessage = `ሰላም! እንኳን ወደ ScanLogic በደህና መጡ! 😊
 
 እኔ የእርስዎ የግል የሂሳብ ረዳት ነኝ። የእርስዎን ወጪዎች እና ሰነዶች በቀላሉ እንዲያስተዳድሩ ለመርዳት ሁልጊዜ ዝግጁ ነኝ። 🚀
@@ -312,26 +313,29 @@ async function handleText(chatId: string, text: string, messageId: number) {
 3. 🔍 ደረሰኞችን መፈለግ - (ለምሳሌ፡ "የካሊዲስ ደረሰኝ አሳየኝ")
 4. 📄 ፎርሞችን መሙላት - የፒዲኤፍ (PDF) ፎርሞችን በራስ-ሰር እሞላልዎታለሁ።
 
-እንዴት ልረዳዎት እችላለሁ? ✨`;
+በቀላሉ ለመጠቀም ከታች ያሉትን ቁልፎች ይጠቀሙ! ✨`;
 
     try {
       await axios.post(`${TELEGRAM_API}/sendMessage`, {
         chat_id: chatId,
         text: welcomeMessage,
         reply_markup: {
-          inline_keyboard: [
+          keyboard: [
             [
-              { text: "📸 የእኔ ደረሰኞች", callback_data: "show_receipts" },
-              { text: "📊 ስታቲስቲክስ", callback_data: "show_stats" },
+              { text: "📸 የእኔ ደረሰኞች" },
+              { text: "📊 ስታቲስቲክስ" }
             ],
             [
-              { text: "🔍 ፈልግ", callback_data: "search_receipts" },
-              { text: "📥 ሪፖርት", callback_data: "export_data" }
+              { text: "🔍 ፈልግ" },
+              { text: "📥 ሪፖርት" }
             ],
             [
-              { text: "❓ እገዛ", callback_data: "show_help" }
+              { text: "❓ እገዛ" },
+              { text: "🏠 ዋና ምናሌ" }
             ]
-          ]
+          ],
+          resize_keyboard: true,
+          persistent: true
         }
       });
       console.log(`Sent welcome message to ${chatId}`);
