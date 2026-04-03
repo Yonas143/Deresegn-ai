@@ -12,13 +12,24 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Load Gemini API key from Secret File or environment variable
+let GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+if (!GEMINI_API_KEY) {
+  try {
+    const fs = await import('fs');
+    GEMINI_API_KEY = fs.readFileSync('/etc/secrets/GEMINI_API_KEY', 'utf8').trim();
+  } catch (error) {
+    console.error('Could not load GEMINI_API_KEY from secret file or environment');
+  }
+}
+
 // Initialize Supabase
 const supabaseUrl = process.env.VITE_SUPABASE_URL || "";
 const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || "";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Initialize Gemini
-const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const genAI = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
 const app = express();
 const PORT = 3000;
@@ -415,7 +426,7 @@ setupVite().then(() => {
       console.log("✓ TELEGRAM_BOT_TOKEN is set");
     }
 
-    if (!process.env.GEMINI_API_KEY) {
+    if (!GEMINI_API_KEY) {
       console.error("WARNING: GEMINI_API_KEY is missing");
     } else {
       console.log("✓ GEMINI_API_KEY is set");
