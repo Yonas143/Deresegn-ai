@@ -198,7 +198,7 @@ async function handlePhoto(chatId: string, photo: any[], messageId: number) {
   try {
     const fileName = `${chatId}/${Date.now()}_${fileId}.jpg`;
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('receipts')
+      .from('deresegn')
       .upload(fileName, imageBuffer, {
         contentType: 'image/jpeg',
         cacheControl: '3600',
@@ -208,7 +208,7 @@ async function handlePhoto(chatId: string, photo: any[], messageId: number) {
     if (!uploadError && uploadData) {
       // Get public URL
       const { data: urlData } = supabase.storage
-        .from('receipts')
+        .from('deresegn')
         .getPublicUrl(fileName);
       
       if (urlData?.publicUrl) {
