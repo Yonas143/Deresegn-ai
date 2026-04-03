@@ -190,7 +190,39 @@ async function handlePhoto(chatId: string, photo: any[], messageId: number) {
 
   // Download photo
   const response = await axios.get(fileUrl, { responseType: 'arraybuffer' });
-  const base64Image = Buffer.from(response.data).toString('base64');
+  const imageBuffer = Buffer.from(response.data);
+  const base64Image = imageBuffer.toString('base64');
+
+  // Upload to Supabase Storage
+  let storedFileUrl = fileUrl; // Fallback to Telegram URL
+  try {
+    const fileName = `${chatId}/${Date.now()}_${fileId}.jpg`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('receipts')
+      .upload(fileName, imageBuffer, {
+        contentType: 'image/jpeg',
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (!uploadError && uploadData) {
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('receipts')
+        .getPublicUrl(fileName);
+      
+      if (urlData?.publicUrl) {
+        storedFileUrl = urlData.publicUrl;
+        console.log(`✓ Uploaded to Supabase Storage: ${storedFileUrl}`);
+      }
+    } else {
+      console.error('Supabase upload error:', uploadError);
+      console.log('Falling back to Telegram URL');
+    }
+  } catch (error) {
+    console.error('Error uploading to Supabase:', error);
+    console.log('Falling back to Telegram URL');
+  }
 
   // Use Gemini for OCR
   const model = "gemini-flash-latest";
@@ -236,7 +268,7 @@ async function handlePhoto(chatId: string, photo: any[], messageId: number) {
         telegram_id: chatId, 
         message_id: messageId.toString(), 
         ...extractedData,
-        file_url: fileUrl,
+        file_url: storedFileUrl, // Use Supabase URL or Telegram URL as fallback
         created_at: new Date().toISOString()
       }
     ]);
@@ -313,6 +345,50 @@ async function handleText(chatId: string, text: string, messageId: number) {
     }
 
     await sendTelegramMessage(chatId, `${data.length} ደረሰኞች ተገኝተዋል። ሪፖርቱ በቅርቡ ይደርስዎታል።`);
+    return;
+  }
+
+  if (text === "/myreceipts" || text.toLowerCase().includes("my receipts")) {
+    await sendTelegramMessage(chatId, "የእርስዎን ደረሰኞች እያመጣሁ ነው... 📸");
+    
+    // Fetch all receipts for this user
+    const { data, error } = await supabase
+      .from('receipts')
+      .select('*')
+      .eq('telegram_id', chatId)
+      .order('created_at', { ascending: false })
+      .limit(10); // Show last 10 receipts
+
+    if (error || !data || data.length === 0) {
+      await sendTelegramMessage(chatId, "ምንም የተቀመጠ ደረሰኝ አላገኘሁም። 😅\n\nደረሰኝ ፎቶ ይላኩልኝ እና እመዘግባለሁ!");
+      return;
+    }
+
+    await sendTelegramMessage(chatId, `✅ ${data.length} ደረሰኞች ተገኝተዋል:\n\nእያሳየሁ ነው...`);
+
+    // Send each receipt with its photo
+    for (const receipt of data) {
+      const caption = `🏪 ${receipt.merchant || 'Unknown'}\n💰 ${receipt.currency || ''} ${receipt.total || 0}\n📅 ${receipt.date || 'No date'}\n📂 ${receipt.category || 'General'}`;
+      
+      if (receipt.file_url) {
+        try {
+          await axios.post(`${TELEGRAM_API}/sendPhoto`, {
+            chat_id: chatId,
+            photo: receipt.file_url,
+            caption: caption
+          });
+          // Small delay to avoid rate limiting
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (error) {
+          console.error(`Error sending receipt photo:`, error);
+          await sendTelegramMessage(chatId, caption + "\n\n(ፎቶው አልተገኘም)");
+        }
+      } else {
+        await sendTelegramMessage(chatId, caption + "\n\n(ምንም ፎቶ የለም)");
+      }
+    }
+
+    await sendTelegramMessage(chatId, `\n✅ ጨርሻለሁ! ${data.length} ደረሰኞችን አሳየሁ።\n\nለተጨማሪ ደረሰኞች፣ ፎቶ ይላኩልኝ!`);
     return;
   }
 
