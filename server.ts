@@ -394,10 +394,17 @@ async function setupVite() {
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    // In production, serve a simple status page or skip frontend
+    app.get('/', (req, res) => {
+      res.json({ 
+        status: 'ok', 
+        message: 'ScanLogic Telegram Bot API',
+        endpoints: {
+          health: '/api/health',
+          webhook: '/api/telegram-webhook',
+          webhookStatus: '/api/webhook-status'
+        }
+      });
     });
   }
 }
@@ -405,20 +412,35 @@ async function setupVite() {
 setupVite().then(() => {
   app.listen(PORT, "0.0.0.0", async () => {
     console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
     
     if (!process.env.TELEGRAM_BOT_TOKEN) {
       console.error("CRITICAL: TELEGRAM_BOT_TOKEN is missing in environment variables!");
+    } else {
+      console.log("✓ TELEGRAM_BOT_TOKEN is set");
+    }
+
+    if (!process.env.GEMINI_API_KEY) {
+      console.error("WARNING: GEMINI_API_KEY is missing");
+    } else {
+      console.log("✓ GEMINI_API_KEY is set");
     }
 
     // Set Telegram Webhook
     if (process.env.APP_URL && process.env.TELEGRAM_BOT_TOKEN) {
       try {
         const webhookUrl = `${process.env.APP_URL}/api/telegram-webhook`;
+        console.log(`Setting webhook to: ${webhookUrl}`);
         await axios.post(`${TELEGRAM_API}/setWebhook`, { url: webhookUrl });
-        console.log(`Telegram Webhook set to: ${webhookUrl}`);
-      } catch (error) {
-        console.error("Error setting Telegram Webhook:", error);
+        console.log(`✓ Telegram Webhook set successfully`);
+      } catch (error: any) {
+        console.error("Error setting Telegram Webhook:", error.response?.data || error.message);
       }
+    } else {
+      console.log("Skipping webhook setup - APP_URL or TELEGRAM_BOT_TOKEN not set");
     }
   });
+}).catch((error) => {
+  console.error("Failed to start server:", error);
+  process.exit(1);
 });
