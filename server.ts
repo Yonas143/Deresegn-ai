@@ -78,7 +78,22 @@ app.post("/api/telegram-webhook", async (req, res) => {
     const data = callback_query.data;
     console.log(`Received callback query from ${chatId}: ${data}`);
 
-    if (data.startsWith("fill_pdf:")) {
+    // Answer callback to remove loading state
+    await axios.post(`${TELEGRAM_API}/answerCallbackQuery`, {
+      callback_query_id: callback_query.id
+    });
+
+    if (data === "show_receipts") {
+      await handleText(chatId, "/myreceipts", 0);
+    } else if (data === "show_stats") {
+      await handleText(chatId, "/stats", 0);
+    } else if (data === "search_receipts") {
+      await handleText(chatId, "/search", 0);
+    } else if (data === "export_data") {
+      await handleText(chatId, "/export", 0);
+    } else if (data === "show_help") {
+      await handleText(chatId, "/help", 0);
+    } else if (data.startsWith("fill_pdf:")) {
       const [_, fileId, profileType] = data.split(":");
       await sendTelegramMessage(chatId, `የ ${profileType} ፕሮፋይልዎን በመጠቀም ፎርሙን እየሞላሁ ነው... ✍️`);
       
@@ -87,11 +102,8 @@ app.post("/api/telegram-webhook", async (req, res) => {
       }, 2000);
     } else if (data === "query_summary_week") {
       await handleText(chatId, "የዚህ ሳምንት ወጪ ስንት ነው?", 0);
-    } else if (data === "export_data") {
-      await handleText(chatId, "/export", 0);
-    } else if (data === "show_help") {
-      await handleText(chatId, "/start", 0);
     }
+    
     return res.sendStatus(200);
   }
 
@@ -309,11 +321,15 @@ async function handleText(chatId: string, text: string, messageId: number) {
         reply_markup: {
           inline_keyboard: [
             [
-              { text: "📊 የሳምንቱ ማጠቃለያ (Weekly Summary)", callback_data: "query_summary_week" },
+              { text: "📸 የእኔ ደረሰኞች", callback_data: "show_receipts" },
+              { text: "📊 ስታቲስቲክስ", callback_data: "show_stats" },
             ],
             [
-              { text: "📥 ሪፖርት ላክልኝ (Export Report)", callback_data: "export_data" },
-              { text: "❓ እርዳታ (Help)", callback_data: "show_help" }
+              { text: "🔍 ፈልግ", callback_data: "search_receipts" },
+              { text: "📥 ሪፖርት", callback_data: "export_data" }
+            ],
+            [
+              { text: "❓ እገዛ", callback_data: "show_help" }
             ]
           ]
         }
@@ -328,6 +344,133 @@ async function handleText(chatId: string, text: string, messageId: number) {
 
   if (text === "/ping") {
     await sendTelegramMessage(chatId, "Pong! 🏓 I am alive and listening.");
+    return;
+  }
+
+  if (text === "/help") {
+    const helpMessage = `📖 የእገዛ መመሪያ (Help Guide)
+
+🤖 እኔ ScanLogic ነኝ - የእርስዎ AI የሂሳብ ረዳት!
+
+📸 የደረሰኝ ስካን (Receipt Scanning):
+• ደረሰኝ ፎቶ ይላኩልኝ
+• AI ራስ-ሰር መረጃውን ያወጣል
+• በ Supabase ውስጥ ይቀመጣል
+
+💬 ትዕዛዞች (Commands):
+/start - ዋና ምናሌ
+/myreceipts - ሁሉንም ደረሰኞች አሳይ
+/stats - የወጪ ስታቲስቲክስ
+/search - ደረሰኞችን ፈልግ
+/export - ሪፖርት ላክ
+/delete - ደረሰኝ ሰርዝ
+/help - ይህን መልዕክት አሳይ
+
+🔍 ጥያቄዎች (Questions):
+• "የዚህ ሳምንት ወጪ ስንት ነው?"
+• "የካሊዲስ ደረሰኝ አሳየኝ"
+• "ከ 100 ብር በላይ ያሉ ደረሰኞች"
+
+💡 ጠቃሚ ምክሮች:
+✓ ግልጽ ፎቶዎችን ይላኩ
+✓ ደረሰኙ ሙሉ እንዲታይ ያድርጉ
+✓ በማንኛውም ቋንቋ ይሰራል
+
+Need help? Just ask! 😊`;
+
+    await sendTelegramMessage(chatId, helpMessage);
+    return;
+  }
+
+  if (text === "/stats" || text.toLowerCase().includes("statistics")) {
+    await sendTelegramMessage(chatId, "የስታቲስቲክስ መረጃዎን እያዘጋጀሁ ነው... 📊");
+    
+    const { data, error } = await supabase
+      .from('receipts')
+      .select('*')
+      .eq('telegram_id', chatId);
+
+    if (error || !data || data.length === 0) {
+      await sendTelegramMessage(chatId, "ምንም ደረሰኝ አላገኘሁም። ደረሰኝ ፎቶ ይላኩልኝ! 📸");
+      return;
+    }
+
+    // Calculate statistics
+    const total = data.reduce((acc, r) => acc + (r.total || 0), 0);
+    const count = data.length;
+    const avgPerReceipt = total / count;
+    
+    // Group by category
+    const byCategory: Record<string, number> = {};
+    data.forEach(r => {
+      const cat = r.category || 'Other';
+      byCategory[cat] = (byCategory[cat] || 0) + (r.total || 0);
+    });
+    
+    // Find top category
+    const topCategory = Object.entries(byCategory)
+      .sort(([,a], [,b]) => b - a)[0];
+    
+    // This week's spending
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    const thisWeek = data.filter(r => new Date(r.created_at) >= oneWeekAgo);
+    const weekTotal = thisWeek.reduce((acc, r) => acc + (r.total || 0), 0);
+
+    const statsMessage = `📊 የወጪ ስታቲስቲክስ
+
+📈 ጠቅላላ:
+• ${count} ደረሰኞች
+• ${total.toFixed(2)} ብር ጠቅላላ ወጪ
+• ${avgPerReceipt.toFixed(2)} ብር አማካይ
+
+📅 የዚህ ሳምንት:
+• ${thisWeek.length} ደረሰኞች
+• ${weekTotal.toFixed(2)} ብር
+
+🏆 ከፍተኛ ዘርፍ:
+• ${topCategory ? topCategory[0] : 'N/A'}: ${topCategory ? topCategory[1].toFixed(2) : 0} ብር
+
+📂 በዘርፍ:
+${Object.entries(byCategory)
+  .sort(([,a], [,b]) => b - a)
+  .map(([cat, amount]) => `• ${cat}: ${amount.toFixed(2)} ብር`)
+  .join('\n')}`;
+
+    await sendTelegramMessage(chatId, statsMessage);
+    return;
+  }
+
+  if (text === "/search") {
+    await sendTelegramMessage(chatId, `🔍 ደረሰኞችን ለመፈለግ:
+
+1️⃣ በነጋዴ ስም:
+"የካሊዲስ ደረሰኝ አሳየኝ"
+
+2️⃣ በመጠን:
+"ከ 100 ብር በላይ"
+"ከ 50 ብር በታች"
+
+3️⃣ በቀን:
+"የዛሬ ደረሰኞች"
+"የዚህ ሳምንት ደረሰኞች"
+
+4️⃣ በዘርፍ:
+"የምግብ ደረሰኞች"
+
+ምን መፈለግ ይፈልጋሉ? 🔎`);
+    return;
+  }
+
+  if (text === "/delete") {
+    await sendTelegramMessage(chatId, `🗑️ ደረሰኝ ለመሰረዝ:
+
+1. /myreceipts ይላኩ
+2. መሰረዝ የሚፈልጉትን ደረሰኝ ይምረጡ
+3. "Delete" የሚለውን ቁልፍ ይጫኑ
+
+ወይም የነጋዴውን ስም ይላኩልኝ:
+"የካሊዲስ ደረሰኝ ሰርዝ"`);
     return;
   }
 
@@ -506,6 +649,25 @@ setupVite().then(() => {
       console.error("WARNING: GEMINI_API_KEY is missing");
     } else {
       console.log("✓ GEMINI_API_KEY is set");
+    }
+
+    // Set bot commands menu
+    try {
+      await axios.post(`${TELEGRAM_API}/setMyCommands`, {
+        commands: [
+          { command: "start", description: "🏠 Start the bot and see main menu" },
+          { command: "myreceipts", description: "📸 View all your receipts" },
+          { command: "stats", description: "📊 View spending statistics" },
+          { command: "search", description: "🔍 Search receipts" },
+          { command: "export", description: "📥 Export data as report" },
+          { command: "delete", description: "🗑️ Delete a receipt" },
+          { command: "help", description: "❓ Get help and instructions" },
+          { command: "ping", description: "🏓 Check if bot is alive" }
+        ]
+      });
+      console.log("✓ Bot commands menu set");
+    } catch (error) {
+      console.error("Error setting bot commands:", error);
     }
 
     // Set Telegram Webhook
