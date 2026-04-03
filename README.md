@@ -2,7 +2,7 @@
 
 [![Open Source](https://img.shields.io/badge/Open%20Source-MIT-green.svg)](LICENSE)
 [![Deploy to Render](https://img.shields.io/badge/Deploy%20to-Render-46E3B7.svg)](https://render.com)
-[![Telegram Bot](https://img.shields.io/badge/Telegram-Bot-blue.svg)](https://t.me/YOUR_BOT_USERNAME)
+[![Telegram Bot](https://img.shields.io/badge/Telegram-Bot-blue.svg)](https://t.me/Mybillsaibot)
 
 ScanLogic is a production-ready, full-stack AI assistant designed to simplify expense tracking and document management. It leverages Google Gemini for intelligent OCR and data extraction, Supabase for secure data persistence, and Telegram as a lightweight, accessible interface.
 
