@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScanLogic - AI-Powered Receipt & Document Assistant</title>
+    <meta name="description" content="Manage your expenses effortlessly with AI. Scan receipts, track spending, and get insights - all through Telegram.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .tagline {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            margin-bottom: 40px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #0088cc;
+            color: white;
+            padding: 18px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .cta-button:hover {
+            background: #006699;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .telegram-icon {
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 1.4rem;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin-top: -40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .feature {
+            padding: 30px;
+            border-radius: 15px;
+            background: #f8f9fa;
+            transition: transform 0.3s;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .feature h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+        }
+
+        .use-cases {
+            margin: 60px 0;
+        }
+
+        .use-case {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .use-case h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .how-it-works {
+            background: #667eea;
+            color: white;
+            padding: 60px 40px;
+            border-radius: 20px;
+            margin: 40px 0;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .step {
+            text-align: center;
+        }
+
+        .step-number {
+            background: white;
+            color: #667eea;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+        }
+
+        .footer-links {
+            margin-top: 20px;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            opacity: 0.9;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .tagline {
+                font-size: 1.1rem;
+            }
+
+            .main-content {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 ScanLogic</h1>
+            <p class="tagline">Your AI-Powered Receipt & Document Assistant</p>
+            <a href="https://t.me/YOUR_BOT_USERNAME" class="cta-button" target="_blank">
+                <span class="telegram-icon">✈️</span>
+                Start Using on Telegram
+            </a>
+        </header>
+
+        <div class="main-content">
+            <section>
+                <h2 style="text-align: center; color: #667eea; margin-bottom: 40px;">What is ScanLogic?</h2>
+                <p style="text-align: center; font-size: 1.2rem; color: #666; max-width: 800px; margin: 0 auto;">
+                    ScanLogic is your personal AI assistant that helps you manage expenses, scan receipts, 
+                    and track spending - all through Telegram. No apps to download, no complicated setup. 
+                    Just send a photo and let AI do the rest.
+                </p>
+            </section>
+
+            <section class="features">
+                <div class="feature">
+                    <div class="feature-icon">📸</div>
+                    <h3>Smart Receipt Scanning</h3>
+                    <p>Take a photo of any receipt and our AI instantly extracts merchant, amount, date, and category. Works with receipts in any language!</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">💬</div>
+                    <h3>Natural Language Queries</h3>
+                    <p>Ask questions like "How much did I spend this week?" or "Show me my coffee expenses" - get instant answers.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <h3>Expense Analytics</h3>
+                    <p>Get detailed insights into your spending patterns. Track by category, merchant, or time period.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Smart Search</h3>
+                    <p>Find any receipt instantly. Search by merchant name, amount, date, or category.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">📄</div>
+                    <h3>PDF Form Filling</h3>
+                    <p>Upload PDF forms and let AI fill them automatically using your saved profile information.</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">📥</div>
+                    <h3>Export Reports</h3>
+                    <p>Download your expense data as Excel or PDF reports for accounting or tax purposes.</p>
+                </div>
+            </section>
+
+            <section class="how-it-works">
+                <h2 style="text-align: center; margin-bottom: 20px;">How It Works</h2>
+                <p style="text-align: center; opacity: 0.9; margin-bottom: 40px;">Get started in 3 simple steps</p>
+                
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Open Telegram</h3>
+                        <p>Search for @YOUR_BOT_USERNAME and start a chat</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Send a Receipt</h3>
+                        <p>Take a photo of any receipt and send it to the bot</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Get Insights</h3>
+                        <p>Ask questions and get instant expense analytics</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="use-cases">
+                <h2 style="text-align: center; color: #667eea; margin-bottom: 40px;">Perfect For</h2>
+                
+                <div class="use-case">
+                    <h4>🏢 Small Business Owners</h4>
+                    <p>Track business expenses on the go. Scan receipts instantly and export reports for your accountant. No more lost receipts or manual data entry.</p>
+                </div>
+
+                <div class="use-case">
+                    <h4>💼 Freelancers & Contractors</h4>
+                    <p>Keep track of project expenses, client reimbursements, and tax-deductible purchases. Generate professional expense reports in seconds.</p>
+                </div>
+
+                <div class="use-case">
+                    <h4>🎓 Students</h4>
+                    <p>Monitor your budget, track spending by category, and understand where your money goes. Perfect for managing student loans and part-time income.</p>
+                </div>
+
+                <div class="use-case">
+                    <h4>👨‍👩‍👧‍👦 Families</h4>
+                    <p>Share expense tracking with family members. Track household spending, groceries, and bills. Set budgets and get alerts.</p>
+                </div>
+
+                <div class="use-case">
+                    <h4>✈️ Travelers</h4>
+                    <p>Track expenses in multiple currencies while traveling. Scan receipts in any language. Perfect for business trips and vacation budgeting.</p>
+                </div>
+            </section>
+
+            <section style="text-align: center; padding: 60px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; color: white;">
+                <h2 style="margin-bottom: 20px;">Ready to Get Started?</h2>
+                <p style="font-size: 1.2rem; margin-bottom: 30px; opacity: 0.95;">Join thousands of users managing their expenses smarter</p>
+                <a href="https://t.me/YOUR_BOT_USERNAME" class="cta-button" target="_blank" style="background: white; color: #667eea;">
+                    <span class="telegram-icon">✈️</span>
+                    Launch ScanLogic Bot
+                </a>
+                <p style="margin-top: 20px; opacity: 0.8; font-size: 0.9rem;">Free to use • No credit card required • Works on any device</p>
+            </section>
+
+            <section style="margin-top: 60px;">
+                <h2 style="text-align: center; color: #667eea; margin-bottom: 40px;">Frequently Asked Questions</h2>
+                
+                <div style="max-width: 800px; margin: 0 auto;">
+                    <details style="margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                        <summary style="font-weight: bold; cursor: pointer; color: #667eea;">Is ScanLogic free to use?</summary>
+                        <p style="margin-top: 10px; color: #666;">Yes! ScanLogic is completely free to use. We may introduce premium features in the future, but core functionality will always remain free.</p>
+                    </details>
+
+                    <details style="margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                        <summary style="font-weight: bold; cursor: pointer; color: #667eea;">Is my data secure?</summary>
+                        <p style="margin-top: 10px; color: #666;">Absolutely. All data is encrypted and stored securely. We never share your information with third parties. You can delete your data anytime.</p>
+                    </details>
+
+                    <details style="margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                        <summary style="font-weight: bold; cursor: pointer; color: #667eea;">What languages are supported?</summary>
+                        <p style="margin-top: 10px; color: #666;">ScanLogic can read receipts in any language! Our AI is trained on multilingual data and works with receipts from around the world.</p>
+                    </details>
+
+                    <details style="margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                        <summary style="font-weight: bold; cursor: pointer; color: #667eea;">Can I use it for business expenses?</summary>
+                        <p style="margin-top: 10px; color: #666;">Yes! ScanLogic is perfect for business expense tracking. Export reports in Excel format for your accountant or tax filing.</p>
+                    </details>
+
+                    <details style="margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                        <summary style="font-weight: bold; cursor: pointer; color: #667eea;">Do I need to download an app?</summary>
+                        <p style="margin-top: 10px; color: #666;">No! ScanLogic works entirely through Telegram. If you have Telegram, you're ready to go. No additional apps needed.</p>
+                    </details>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 ScanLogic. Built with ❤️ for smarter expense management.</p>
+            <div class="footer-links">
+                <a href="https://github.com/yoniapp/Deresegn-ai" target="_blank">GitHub</a>
+                <a href="https://t.me/YOUR_BOT_USERNAME" target="_blank">Telegram Bot</a>
+                <a href="/api/health">API Status</a>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

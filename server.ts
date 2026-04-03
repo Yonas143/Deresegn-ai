@@ -394,17 +394,12 @@ async function setupVite() {
     });
     app.use(vite.middlewares);
   } else {
-    // In production, serve a simple status page or skip frontend
+    // In production, serve the landing page
+    const publicPath = path.join(__dirname, 'public');
+    app.use(express.static(publicPath));
+    
     app.get('/', (req, res) => {
-      res.json({ 
-        status: 'ok', 
-        message: 'ScanLogic Telegram Bot API',
-        endpoints: {
-          health: '/api/health',
-          webhook: '/api/telegram-webhook',
-          webhookStatus: '/api/webhook-status'
-        }
-      });
+      res.sendFile(path.join(publicPath, 'index.html'));
     });
   }
 }
